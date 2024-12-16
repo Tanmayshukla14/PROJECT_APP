@@ -46,6 +46,7 @@ The model is trained on a dataset of banknote features.
 It classifies banknotes as authentic (0) or fake (1) based on the provided features.
 
 Future Enhancements
+
 1.Add visualization for feature importance.
 2.Extend support for additional datasets and models.
 3.Deploy the app on platforms like Streamlit Cloud or Heroku for public access.
