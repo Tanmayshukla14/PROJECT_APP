@@ -1,68 +1,62 @@
 import streamlit as st
-import numpy as np 
+import numpy as np
 import pickle
 
-loaded_model = pickle.load(open('classifier.pkl', 'rb'))
 
-# creating a function for Prediction
+try:
+    loaded_model = pickle.load(open('classifier.pkl', 'rb'))
+except FileNotFoundError:
+    st.error('Model file not found. Please ensure "classifier.pkl" exists in the project directory.')
+    st.stop()
 
+# Prediction function
 def banknote_predict(input_data):
-    # changing the input_data to numpy array
     input_data_as_numpy_array = np.asarray(input_data)
-
-    # reshape the array as we are predicting for one instance
-    input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
-
+    input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
     prediction = loaded_model.predict(input_data_reshaped)
-    print(prediction)
+    return 'The Note is Authentic' if prediction[0] == 0 else 'The Note is Fake'
 
-    if (prediction[0] == 0):
-      return 'The Note is Authentic'
-    else:
-      return 'The Note is Fake'
+# App layout
+st.title('💵 Banknote Authentication Web App')
+st.markdown('This application predicts whether a banknote is **authentic** or **fake** based on given features.')
 
-#CODING THE WEBSITE LAYOUT
-
-st.title('Hello! , This is my first WebApp in Streamlit')
-
-
-
-'''
-
-  
 st.divider()
 with st.expander('Project Features'):
-  st.write('*The Project takes input of given features :*')
-  st.caption('1. Variance')
-  st.caption('2. skewness')
-  st.caption('3. Curtosis')
-  st.caption('4. Entropy')
+    st.write('*This project analyzes the following features of banknotes:*')
+    st.caption('1. Variance')
+    st.caption('2. Skewness')
+    st.caption('3. Curtosis')
+    st.caption('4. Entropy')
 
-#MAIN LOGIC
+# Main logic
 def main():
-    # giving a title
-    st.subheader('Enter the feature of 💵')
+    st.subheader('Enter the Features of the Banknote')
     
-    
-    # getting the input data from the user
-    variance = st.text_input('Enter the value of variance')
-    skewness = st.text_input('Enter the value of skewness')
-    curtosis = st.text_input('Enter the value of curtosis')
-    entropy =  st.text_input('Enter the value of entropy')
-    
-    # code for Prediction
-    prediction = ''
-    
-    # creating a button for Prediction
-    
+    #  input fields
+    variance = st.text_input('Enter the value of Variance')
+    skewness = st.text_input('Enter the value of Skewness')
+    curtosis = st.text_input('Enter the value of Curtosis')
+    entropy = st.text_input('Enter the value of Entropy')
+
+    prediction = ''  
+
     if st.button('Predict The Result'):
-        prediction = banknote_predict([variance,skewness,curtosis,entropy])
-        
-        
-    st.success(prediction)
+        if not (variance and skewness and curtosis and entropy):
+            st.warning('Please fill in all the input fields.')
+        else:
+            try:
+                # Convert inputs to float
+                input_features = [float(variance), float(skewness), float(curtosis), float(entropy)]
+                prediction = banknote_predict(input_features)
+                if prediction == 'The Note is Authentic':
+                    st.success('✔️ The Note is Authentic')
+                else:
+                    st.error('❌ The Note is Fake')
+            except ValueError:
+                st.error('Please enter valid numeric values for all features.')
 
     st.divider()
-    st.subheader('Made with 💌')
+    st.subheader('Made with 💌 by Tanmay Shukla')
 
 if __name__ == '__main__':
     main()
